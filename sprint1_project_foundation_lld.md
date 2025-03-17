@@ -3,79 +3,96 @@
 ## Sprint 1 Technical Specification
 
 ### Overview
-This sprint focuses on establishing the foundational architecture for the invoicing system. We're setting up a robust FastAPI application with proper separation of concerns, database integration, and initial company management features.
+This sprint focuses on establishing the foundational architecture for the invoicing system. We're setting up a robust FastAPI application with proper separation of concerns, database integration, and initial company management features. The foundation sprint is critical as it sets up the architectural patterns and best practices that will be followed throughout the project lifecycle.
 
 ### Implementation Steps
 
 1. **Project Structure Setup**
+   The project structure follows a modular design pattern to ensure scalability and maintainability. Each component has a specific responsibility and is organized in a way that makes the codebase easy to navigate and understand.
    - Creating a modular structure separating routes, models, and business logic
    - Implementing a clean architecture pattern for maintainability
    - Setting up configuration management for different environments
 
 2. **Database Integration**
+   Database integration is implemented using SQLAlchemy ORM to provide a robust and type-safe interface to our PostgreSQL database. This layer handles all data persistence operations and ensures data integrity.
    - Establishing PostgreSQL connection using SQLAlchemy ORM
    - Creating initial models for company data
    - Setting up migration system for schema changes
    - Implementing session management and connection pooling
 
 3. **API Layer**
+   The API layer serves as the interface between the frontend and our business logic. It's built using FastAPI to leverage automatic OpenAPI documentation, type checking, and high performance.
    - Building RESTful endpoints for company management
    - Implementing input validation using Pydantic models
    - Setting up error handling and response formatting
    - Adding basic authentication structure
 
 4. **Template System**
+   The template system provides server-side rendering capabilities using Jinja2. It's structured to support component reuse and maintain consistent styling across the application.
    - Creating base templates for consistent UI
    - Setting up static file serving
    - Implementing basic layout structure
 
 ### Key Technical Decisions
 
-- **FastAPI Framework**: Chosen for its modern features, async support, and automatic OpenAPI documentation
-- **SQLAlchemy ORM**: Selected for type safety and powerful querying capabilities
-- **Pydantic**: Used for data validation and serialization
-- **Jinja2**: Templating engine for server-side rendering
+Each technical choice has been made with specific benefits in mind:
+
+- **FastAPI Framework**: Selected for its modern features, async support, and automatic OpenAPI documentation. FastAPI provides excellent performance metrics and built-in support for type checking through Pydantic.
+
+- **SQLAlchemy ORM**: Chosen for its robust type safety and powerful querying capabilities. It provides a pythonic interface to database operations while maintaining flexibility for complex queries.
+
+- **Pydantic**: Implements runtime data validation and serialization. This ensures that all data flowing through the application meets our defined schemas and types.
+
+- **Jinja2**: Our templating engine choice for server-side rendering, providing powerful template inheritance and macro capabilities.
 
 ### 1. Project Structure
+The project structure follows a domain-driven design approach, separating concerns into distinct layers:
+
 ```
 /invoicing
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── config.py
-│   ├── api/
-│   │   ├── __init__.py
-│   │   ├── endpoints/
-│   │   │   ├── company.py
-│   │   │   └── invoice.py
-│   ├── core/
-│   │   ├── security.py
-│   │   └── config.py
-│   ├── db/
-│   │   ├── session.py
-│   │   └── base.py
-│   ├── models/
-│   │   ├── company.py
-│   │   └── invoice.py
-│   └── schemas/
-│       ├── company.py
-│       └── invoice.py
-└── templates/
-    └── base.html
+├── app/                      # Main application package
+│   ├── __init__.py          # Package initializer
+│   ├── main.py              # Application entry point
+│   ├── config.py            # Configuration management
+│   ├── api/                 # API layer
+│   │   ├── __init__.py     
+│   │   ├── endpoints/       # Route handlers
+│   │   │   ├── company.py   # Company management endpoints
+│   │   │   └── invoice.py   # Invoice management endpoints
+│   ├── core/                # Core functionality
+│   │   ├── security.py      # Authentication & authorization
+│   │   └── config.py        # Core configuration
+│   ├── db/                  # Database layer
+│   │   ├── session.py       # Database session management
+│   │   └── base.py         # Base model class
+│   ├── models/              # SQLAlchemy models
+│   │   ├── company.py       # Company data model
+│   │   └── invoice.py       # Invoice data model
+│   └── schemas/             # Pydantic models
+│       ├── company.py       # Company data validation
+│       └── invoice.py       # Invoice data validation
+└── templates/               # Jinja2 templates
+    └── base.html           # Base template layout
 ```
 
 ### 2. Database Implementation
+The database layer is designed for reliability and performance:
+
 #### Connection Setup (db/session.py)
+Implements connection pooling and session management:
+
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/invoicing"
+SQLALCHEMY_DATABASE_URL = "postgresql://user:password@0.0.0.0/invoicing"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ```
 
 #### Base Models (models/company.py)
+Implements the company data model with audit trails:
+
 ```python
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
@@ -98,6 +115,8 @@ class Company(Base):
 ```
 
 ### 3. API Endpoints
+The API layer implements RESTful principles and proper error handling:
+
 #### Company Management (api/endpoints/company.py)
 ```python
 from fastapi import APIRouter, Depends, HTTPException
@@ -124,6 +143,8 @@ def read_company(company_id: int, db: Session = Depends(get_db)):
 ```
 
 ### 4. Template System
+The template system provides a consistent look and feel:
+
 #### Base Template (templates/base.html)
 ```html
 <!DOCTYPE html>
@@ -149,12 +170,14 @@ def read_company(company_id: int, db: Session = Depends(get_db)):
 ```
 
 ### 5. Testing Strategy
-- Unit tests for database models
-- Integration tests for API endpoints
-- Template rendering tests
-- Database migration tests
+Comprehensive testing approach covering multiple layers:
+- Unit tests for database models ensuring data integrity
+- Integration tests for API endpoints verifying business logic
+- Template rendering tests checking UI consistency
+- Database migration tests validating schema changes
 
 ### 6. Dependencies
+Core dependencies required for the project:
 ```toml
 [dependencies]
 fastapi
@@ -167,14 +190,16 @@ python-multipart
 ```
 
 ### 7. Configuration Management
+Environment configuration handling:
 #### Environment Variables
-- `DATABASE_URL`
-- `SECRET_KEY`
-- `DEBUG_MODE`
-- `API_PREFIX`
+- `DATABASE_URL`: Database connection string
+- `SECRET_KEY`: Application security key
+- `DEBUG_MODE`: Development mode flag
+- `API_PREFIX`: API routing prefix
 
 ### 8. Security Considerations
+Multiple layers of security implementation:
 - Input validation using Pydantic models
 - SQL injection prevention through SQLAlchemy
-- CORS configuration
-- Rate limiting implementation
+- CORS configuration for API security
+- Rate limiting implementation to prevent abuse
