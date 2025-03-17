@@ -25,19 +25,40 @@ A web-based invoice management system that allows for creation, storage, and man
 
 #### 3. Database Schema
 ```sql
+CREATE TABLE company_details (
+    id SERIAL PRIMARY KEY,
+    company_name VARCHAR(255),
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100),
+    vat_number VARCHAR(50),
+    company_number VARCHAR(50),
+    phone VARCHAR(50),
+    email VARCHAR(255)
+);
+
 CREATE TABLE invoices (
     id SERIAL PRIMARY KEY,
     invoice_number VARCHAR(50) UNIQUE,
+    company_id INTEGER REFERENCES company_details(id),
     client_name VARCHAR(255),
     client_email VARCHAR(255),
+    client_address TEXT,
     issue_date DATE,
     due_date DATE,
+    payment_terms VARCHAR(255),
     items JSONB,
     subtotal DECIMAL(10,2),
-    tax DECIMAL(10,2),
+    tax_rate DECIMAL(5,2),
+    tax_amount DECIMAL(10,2),
     total DECIMAL(10,2),
+    status VARCHAR(50) DEFAULT 'draft',
+    notes TEXT,
     pdf_path VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
